@@ -4,8 +4,10 @@ import fikence.data.atom.AtomState;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.group.FlxSpriteContainer.FlxTypedSpriteContainer;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
+import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.system.WorkOutput.State;
 
@@ -19,6 +21,25 @@ class Atom extends FlxSprite
 		this.ID = Atom.idEnumerator++;
 
 		this.state = state;
+
+		debugLabel = new FlxText();
+	}
+
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		orbitElapsed += elapsed;
+	}
+
+	override function getScreenPosition(?result:FlxPoint, ?camera:FlxCamera):FlxPoint
+	{
+		var output:FlxPoint = super.getScreenPosition(result, camera);
+
+		output.x += (Math.sin(orbitElapsed) * orbitRadius) * this.scale.x;
+		output.y += (Math.cos(orbitElapsed) * orbitRadius) * this.scale.y;
+
+		return output;
 	}
 
 	public static var idEnumerator:Int = 0;
@@ -38,6 +59,9 @@ class Atom extends FlxSprite
 		return state = _state;
 	}
 
+	var orbitRadius = 0.0;
+	var orbitElapsed = FlxG.random.float(0, FlxMath.MAX_VALUE_INT / 10);
+
 	function updateStateProperties(_state:AtomState)
 	{
 		switch (_state)
@@ -56,23 +80,40 @@ class Atom extends FlxSprite
 		}
 	}
 
-	var orbitRadius = 0.0;
-	var orbitElapsed = FlxG.random.float(0, FlxMath.MAX_VALUE_INT / 10);
+	var overlappingAtoms = [];
 
-	override function update(elapsed:Float)
+	public function check(atoms:AtomContainer)
 	{
-		super.update(elapsed);
+		overlappingAtoms = [];
+		for (atom in atoms)
+		{
+			if (atom == null)
+				continue;
 
-		orbitElapsed += elapsed;
+			if (atom.ID == this.ID)
+				continue;
+
+			if (overlaps(atom, true))
+				overlappingAtoms.push(atom.ID);
+		}
 	}
 
-	override function getScreenPosition(?result:FlxPoint, ?camera:FlxCamera):FlxPoint
+	var debugLabel:FlxText;
+
+	override function draw()
 	{
-		var output:FlxPoint = super.getScreenPosition(result, camera);
+		super.draw();
 
-		output.x += (Math.sin(orbitElapsed) * orbitRadius) * this.scale.x;
-		output.y += (Math.cos(orbitElapsed) * orbitRadius) * this.scale.y;
+		if (debugLabel != null)
+		{
+			debugLabel.cameras = cameras;
 
-		return output;
+			debugLabel.text = '$overlappingAtoms';
+
+			debugLabel.x = (this.getScreenPosition().x - this.width / 2) - (debugLabel.width / 2);
+			debugLabel.y = (this.getScreenPosition().y - this.height / 2) - this.height - debugLabel.height;
+
+			debugLabel.draw();
+		}
 	}
 }

@@ -1,8 +1,8 @@
 package fikence;
 
-import fikence.data.atom.AtomData;
 import fikence.data.atom.AtomState;
 import fikence.pieces.Atom;
+import fikence.pieces.AtomContainer;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.group.FlxSpriteContainer.FlxTypedSpriteContainer;
@@ -10,19 +10,29 @@ import flixel.util.FlxColor;
 
 class VisualizerState extends FlxState
 {
-	public var atoms:FlxTypedSpriteContainer<Atom>;
+	public var atoms:AtomContainer;
 
 	override function create()
 	{
 		super.create();
 
-		atoms = new FlxTypedSpriteContainer<Atom>();
+		atoms = new AtomContainer();
 		add(atoms);
 
-		for (i in 0...100)
+		for (i in 0...50)
 		{
 			addAtom(FlxG.random.bool(75) ? TYPE_A : TYPE_B);
 		}
+	}
+
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		atoms.forEach(function(atom)
+		{
+			atom.check(atoms);
+		});
 	}
 
 	function addAtom(state:AtomState)
