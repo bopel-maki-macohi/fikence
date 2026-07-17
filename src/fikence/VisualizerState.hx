@@ -15,6 +15,7 @@ class VisualizerState extends FlxState
 		super.create();
 
 		atoms = new FlxTypedSpriteContainer<Atom>();
+		add(atoms);
 
 		addAtom(0xFFFF0000);
 		addAtom(0xFF00FF00);
