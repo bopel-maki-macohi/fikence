@@ -13,6 +13,13 @@ import lime.system.WorkOutput.State;
 
 class Atom extends FlxSprite
 {
+	public static var idEnumerator:Int = 0;
+
+	public static final debug:Bool = true;
+	public static final debug_bg:Bool = false;
+
+	public static final size:Int = 4;
+
 	override public function new(?state:State)
 	{
 		super();
@@ -22,7 +29,12 @@ class Atom extends FlxSprite
 
 		this.state = state;
 
-		debugLabel = new FlxText();
+		if (Atom.debug)
+		{
+			debugLabel = new FlxText();
+			if (Atom.debug_bg)
+				debugLabelBG = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+		}
 	}
 
 	override function update(elapsed:Float)
@@ -41,10 +53,6 @@ class Atom extends FlxSprite
 
 		return output;
 	}
-
-	public static var idEnumerator:Int = 0;
-
-	public static final size:Int = 4;
 
 	public var state(default, set):AtomState;
 
@@ -99,19 +107,37 @@ class Atom extends FlxSprite
 	}
 
 	var debugLabel:FlxText;
+	var debugLabelBG:FlxSprite;
 
 	override function draw()
 	{
 		super.draw();
 
+		if (!Atom.debug)
+			return;
+
 		if (debugLabel != null)
 		{
 			debugLabel.cameras = cameras;
 
-			debugLabel.text = '$overlappingAtoms';
+			debugLabel.text = '';
+			debugLabel.text += '$ID';
+			// debugLabel.text += '\n$overlappingAtoms';
 
-			debugLabel.x = (this.getScreenPosition().x - this.width / 2) - (debugLabel.width / 2);
-			debugLabel.y = (this.getScreenPosition().y - this.height / 2) - this.height - debugLabel.height;
+			debugLabel.x = (this.getScreenPosition().x - this.width);
+			debugLabel.y = (this.getScreenPosition().y) - this.height - debugLabel.height;
+
+			if (debugLabelBG != null && Atom.debug_bg)
+			{
+				debugLabelBG.cameras = cameras;
+
+				debugLabelBG.scale.set(debugLabel.width, debugLabel.height);
+				debugLabelBG.updateHitbox();
+
+				debugLabelBG.setPosition(debugLabel.x, debugLabel.y);
+
+				debugLabelBG.draw();
+			}
 
 			debugLabel.draw();
 		}

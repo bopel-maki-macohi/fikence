@@ -31,7 +31,7 @@ class VisualizerState extends FlxState
 
 		atoms.forEach(function(atom)
 		{
-			atom.check(atoms);
+			atom?.check(atoms);
 		});
 	}
 
