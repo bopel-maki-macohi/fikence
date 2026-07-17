@@ -2,7 +2,11 @@ package fikence.pieces;
 
 import fikence.data.atom.AtomData;
 import fikence.data.atom.AtomState;
+import flixel.FlxCamera;
+import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.math.FlxMath;
+import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 
 class Atom extends FlxSprite
@@ -29,23 +33,46 @@ class Atom extends FlxSprite
 			_state = AtomState.TYPE_0;
 
 		// TODO: Make state properties data-driven
-		updateStateColor(_state);
+		updateStateProperties(_state);
 
 		return state = _state;
 	}
 
-	function updateStateColor(_state:AtomState)
+	function updateStateProperties(_state:AtomState)
 	{
-		color = switch (_state)
+		switch (_state)
 		{
 			case TYPE_0:
-				0xFFFFFFFF;
+				orbitRadius = 0;
+				color = 0xFFFFFFFF;
+
 			case TYPE_A:
-				0xFFFF0000;
+				orbitRadius = 15;
+				color = 0xFFFF0000;
+
 			case TYPE_B:
-				0xFF00FF00;
-			default:
-				0xFFFFFFFF;
+				orbitRadius = 7.5;
+				color = 0xFF00FF00;
 		}
+	}
+
+	var orbitRadius = 0.0;
+	var orbitElapsed = FlxG.random.float(0, FlxMath.MAX_VALUE_INT / 10);
+
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		orbitElapsed += elapsed;
+	}
+
+	override function getScreenPosition(?result:FlxPoint, ?camera:FlxCamera):FlxPoint
+	{
+		var output:FlxPoint = super.getScreenPosition(result, camera);
+
+		output.x += (Math.sin(orbitElapsed) * orbitRadius) * this.scale.x;
+		output.y += (Math.cos(orbitElapsed) * orbitRadius) * this.scale.y;
+
+		return output;
 	}
 }
