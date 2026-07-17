@@ -26,7 +26,7 @@ class VisualizerState extends FlxState
 	{
 		var atom = new Atom(properties);
 
-		atom.setPosition(FlxG.random.float(0, FlxG.width - atom.width), FlxG.random.float(0, FlxG.height - atom.height));
+		atom.setPosition(FlxG.random.float(0, FlxG.width - (atom.width * 2)), FlxG.random.float(0, FlxG.height - (atom.height * 2)));
 
 		atoms.add(atom);
 	}
