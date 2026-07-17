@@ -1,6 +1,5 @@
 package fikence.pieces;
 
-import fikence.data.atom.AtomData;
 import fikence.data.atom.AtomState;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -8,17 +7,18 @@ import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
+import lime.system.WorkOutput.State;
 
 class Atom extends FlxSprite
 {
-	override public function new(?properties:AtomData)
+	override public function new(?state:State)
 	{
 		super();
 
 		makeGraphic(Atom.size, Atom.size, 0xFFFFFFFF);
 		this.ID = Atom.idEnumerator++;
 
-		state = properties?.state;
+		this.state = state;
 	}
 
 	public static var idEnumerator:Int = 0;

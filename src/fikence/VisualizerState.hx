@@ -1,6 +1,7 @@
 package fikence;
 
 import fikence.data.atom.AtomData;
+import fikence.data.atom.AtomState;
 import fikence.pieces.Atom;
 import flixel.FlxG;
 import flixel.FlxState;
@@ -18,15 +19,15 @@ class VisualizerState extends FlxState
 		atoms = new FlxTypedSpriteContainer<Atom>();
 		add(atoms);
 
-		addAtom({state: TYPE_A});
-		addAtom({state: TYPE_A});
-		addAtom({state: TYPE_B});
-		addAtom({state: TYPE_B});
+		for (i in 0...100)
+		{
+			addAtom(FlxG.random.bool(75) ? TYPE_A : TYPE_B);
+		}
 	}
 
-	function addAtom(properties:AtomData)
+	function addAtom(state:AtomState)
 	{
-		var atom = new Atom(properties);
+		var atom = new Atom(state);
 
 		atom.setPosition(FlxG.random.float(0, FlxG.width - (atom.width * 10)), FlxG.random.float(0, FlxG.height - (atom.height * 10)));
 
