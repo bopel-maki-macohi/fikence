@@ -20,20 +20,19 @@ class Atom extends FlxSprite
 
 	public static final size:Int = 4;
 
-	override public function new(?state:State)
+	override public function new(?_state:State)
 	{
 		super();
 
 		makeGraphic(Atom.size, Atom.size, 0xFFFFFFFF);
-		this.ID = Atom.idEnumerator++;
+		ID = Atom.idEnumerator++;
 
-		this.state = state;
+		state = _state;
 
 		if (Atom.debug)
 		{
 			debugLabel = new FlxText();
-			if (Atom.debug_bg)
-				debugLabelBG = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+			if (Atom.debug_bg) debugLabelBG = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
 		}
 	}
 
@@ -58,8 +57,7 @@ class Atom extends FlxSprite
 
 	function set_state(_state:AtomState):AtomState
 	{
-		if (_state == null)
-			_state = AtomState.TYPE_0;
+		if (_state == null) _state = AtomState.TYPE_0;
 
 		// TODO: Make state properties data-driven
 		updateStateProperties(_state);
@@ -93,17 +91,46 @@ class Atom extends FlxSprite
 	public function check(atoms:AtomContainer)
 	{
 		overlappingAtoms = [];
+
 		for (atom in atoms)
 		{
-			if (atom == null)
-				continue;
+			if (atom == null) continue;
 
-			if (atom.ID == this.ID)
-				continue;
+			if (atom.ID == this.ID) continue;
 
-			if (overlaps(atom, true))
-				overlappingAtoms.push(atom.ID);
+			if (overlaps(atom, true) && !overlappingAtoms.contains(atom)) overlappingAtoms.push(atom);
 		}
+
+		var o_a1 = overlappingAtoms[0] ?? null;
+		var o_a2 = overlappingAtoms[1] ?? null;
+
+		function stateConditional(currentstate:AtomState, states:Array<AtomState>, newstate:AtomState)
+		{
+			if (this.state != currentstate) return;
+
+			var genstates:Array<AtomState> = [];
+
+			if (states.length >= 1 && o_a1 != null)
+			{
+				atoms.remove(o_a1);
+				genstates.push(o_a1.state);
+			}
+			if (states.length >= 2 && o_a2 != null)
+			{
+				atoms.remove(o_a2);
+				genstates.push(o_a2.state);
+			}
+
+			if (genstates == states)
+			{
+				state = newstate;
+			}
+		}
+
+		stateConditional(TYPE_A, [TYPE_A], TYPE_B);
+		// stateConditional(TYPE_A, [TYPE_B], TYPE_A);
+		stateConditional(TYPE_B, [TYPE_B], TYPE_A);
+		// stateConditional(TYPE_B, [TYPE_A], TYPE_B);
 	}
 
 	var debugLabel:FlxText;
@@ -113,16 +140,15 @@ class Atom extends FlxSprite
 	{
 		super.draw();
 
-		if (!Atom.debug)
-			return;
+		if (!Atom.debug) return;
 
 		if (debugLabel != null)
 		{
 			debugLabel.cameras = cameras;
 
 			debugLabel.text = '';
-			debugLabel.text += '$ID';
-			// debugLabel.text += '\n$overlappingAtoms';
+			debugLabel.text += '$ID : $state';
+			debugLabel.text += '\n${[for (atom in overlappingAtoms) atom.ID]}';
 
 			debugLabel.x = (this.getScreenPosition().x - this.width);
 			debugLabel.y = (this.getScreenPosition().y) - this.height - debugLabel.height;
