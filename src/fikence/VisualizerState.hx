@@ -19,6 +19,8 @@ class VisualizerState extends FlxState
 		add(atoms);
 
 		addAtom({state: TYPE_A});
+		addAtom({state: TYPE_A});
+		addAtom({state: TYPE_B});
 		addAtom({state: TYPE_B});
 	}
 
@@ -26,7 +28,7 @@ class VisualizerState extends FlxState
 	{
 		var atom = new Atom(properties);
 
-		atom.setPosition(FlxG.random.float(0, FlxG.width - (atom.width * 2)), FlxG.random.float(0, FlxG.height - (atom.height * 2)));
+		atom.setPosition(FlxG.random.float(0, FlxG.width - (atom.width * 10)), FlxG.random.float(0, FlxG.height - (atom.height * 10)));
 
 		atoms.add(atom);
 	}
